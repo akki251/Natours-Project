@@ -122,7 +122,7 @@ tourSchema.pre(/^find/, function(next) {
 
 // AGGREGATION MIDDLEWARE
 
-
+tourSchema
 
 const Tour = mongoose.model('Tour', tourSchema);
 
