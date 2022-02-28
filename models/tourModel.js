@@ -1,76 +1,128 @@
 const mongoose = require('mongoose');
 
-const tourSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'A tour must have a name'],
-    unique: true,
-    trim: true
-  },
+const slugify = require('slugify'); // for creating slug.. that is the name of tour in url
 
-  duration: {
-    type: Number,
-    required: [true, 'A tour must have a duration']
-  },
+const tourSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'A tour must have a name'],
+      unique: true,
+      trim: true
+    },
 
-  maxGroupSize: {
-    type: Number,
-    required: [true, 'A tour must have a group size']
-  },
+    slug: String,
 
-  difficulty: {
-    type: String,
-    required: [true, 'A tour must have difficulty']
-  },
+    duration: {
+      type: Number,
+      required: [true, 'A tour must have a duration']
+    },
 
-  ratingAverage: {
-    type: Number,
-    default: 4.5
-  },
+    maxGroupSize: {
+      type: Number,
+      required: [true, 'A tour must have a group size']
+    },
 
-  ratingQuantity: {
-    type: Number,
-    default: 0
-  },
+    difficulty: {
+      type: String,
+      required: [true, 'A tour must have difficulty']
+    },
 
-  priceDiscount: {
-    type: Number
-  },
+    ratingsAverage: {
+      type: Number,
+      default: 4.5
+    },
 
-  summary: {
-    type: String,
-    trim: true,
-    required: [true, 'A true must have a description']
-  },
+    ratingsQuantity: {
+      type: Number,
+      default: 0
+    },
 
-  description: {
-    type: String,
-    trim: true
-  },
+    priceDiscount: {
+      type: Number
+    },
 
-  imageCover: {
-    type: String,
-    required: [true, 'A tour must have a cover image']
-  },
-  rating: {
-    type: Number,
-    default: 4.5
-  },
-  price: {
-    type: Number,
-    required: [true, 'A tour must have a price']
-  },
+    summary: {
+      type: String,
+      trim: true,
+      required: [true, 'A true must have a description']
+    },
 
-  images: [String],
+    description: {
+      type: String,
+      trim: true
+    },
 
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-    select: false // so that it doesn't go up in client side
+    imageCover: {
+      type: String,
+      required: [true, 'A tour must have a cover image']
+    },
+    rating: {
+      type: Number,
+      default: 4.5
+    },
+    price: {
+      type: Number,
+      required: [true, 'A tour must have a price']
+    },
+
+    images: [String],
+
+    createdAt: {
+      type: Date,
+      default: Date.now(),
+      select: false // so that it doesn't go up in client side
+    },
+
+    startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false
+    }
   },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  }
+);
 
-  startDates: [Date]
+// virtual properties ,
+//  we cannot use arrow function because of this.
+//  we cannot use virtual properties in queries
+tourSchema.virtual('durationWeeks').get(function() {
+  return this.duration / 7;
 });
+
+// DOCUMENT middleware
+//  pre  : runs before .save() and .create()  but not on insertMany()
+tourSchema.pre('save', function(next) {
+  // this is document which is going to save
+  this.slug = slugify(this.name, {
+    lower: true
+  });
+
+  next(); // just like express
+});
+
+// //post middleware
+// tourSchema.post('save', function(doc, next) {
+//   console.log(doc);
+//   next();
+// });
+
+// QUERY MIDDLEWARE
+
+// tourSchema.pre('find', function(next) {
+tourSchema.pre(/^find/, function(next) {
+  // this is query, not document
+  this.find({ secretTour: { $ne: true } });
+
+  next();
+});
+
+// AGGREGATION MIDDLEWARE
+
+
 
 const Tour = mongoose.model('Tour', tourSchema);
 
