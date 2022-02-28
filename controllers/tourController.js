@@ -112,14 +112,13 @@ exports.getTour = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: 'failure',
-      message: 'couldnot find all tours'
+      message: 'couldn\'t find all tours'
     });
   }
 };
 
 exports.createTour = async (req, res) => {
   try {
-    console.log(req.body);
     const newTour = await Tour.create(req.body);
 
     res.status(200).json({
@@ -174,6 +173,7 @@ exports.deleteTour = async (req, res) => {
 
 exports.getTourStats = async (req, res) => {
   try {
+    // NOTE:
     // every thing works on stages
     // one by one
 

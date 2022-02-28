@@ -12,7 +12,7 @@ const tourSchema = new mongoose.Schema(
 
       // only available for string
       maxLength: [40, 'A tour name must have atmost 40 characters'],
-      minLength: [10, 'A tour name must have atleast 10 chracters']
+      minLength: [10, 'A tour name must have atleast 10 characters']
     },
 
     slug: String,
@@ -50,9 +50,15 @@ const tourSchema = new mongoose.Schema(
 
     priceDiscount: {
       type: Number,
+
       // custom validator
-      validate: function(val) {
-        return val < this.price; 
+      validate: {
+        validator: function(val) {
+          // NOTE:  this kind of validator only for creating new documents, and not for updating
+          return val < this.price;
+        },
+        //mongoose syntax
+        message: 'Discount price ({VALUE}) should be below the regular price'
       }
     },
 
@@ -85,7 +91,7 @@ const tourSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now(),
-      select: false // so that it doesn't go up in client side
+      select: false // NOTE: so that it doesn't go up in client side
     },
 
     startDates: [Date],
@@ -100,6 +106,7 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// NOTE:
 // virtual properties ,
 //  we cannot use arrow function because of this.
 //  we cannot use virtual properties in queries
@@ -108,7 +115,7 @@ tourSchema.virtual('durationWeeks').get(function() {
 });
 
 // DOCUMENT middleware
-//  pre  : runs before .save() and .create()  but not on insertMany()
+// NOTE: pre  : runs before .save() and .create()  but not on insertMany()
 tourSchema.pre('save', function(next) {
   // this is document which is going to save
   this.slug = slugify(this.name, {
@@ -131,7 +138,7 @@ tourSchema.pre(/^find/, function(next) {
 });
 
 // AGGREGATION MIDDLEWARE
-// this points to aggregation object
+// NOTE: this points to aggregation object
 tourSchema.pre('aggregate', function(next) {
   //unshift add in front of array
   this.pipeline().unshift({
