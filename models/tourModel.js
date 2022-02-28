@@ -8,7 +8,11 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A tour must have a name'],
       unique: true,
-      trim: true
+      trim: true.valueOf,
+
+      // only available for string
+      maxLength: [40, 'A tour name must have atmost 40 characters'],
+      minLength: [10, 'A tour name must have atleast 10 chracters']
     },
 
     slug: String,
@@ -25,12 +29,18 @@ const tourSchema = new mongoose.Schema(
 
     difficulty: {
       type: String,
-      required: [true, 'A tour must have difficulty']
+      required: [true, 'A tour must have difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficulty'],
+        message: 'Difficulty is either easy ,  medium or difficult'
+      }
     },
 
     ratingsAverage: {
       type: Number,
-      default: 4.5
+      default: 4.5,
+      min: [1, 'Rating must be atleast 1.0'],
+      max: [5, 'Rating must be atmost 5.0']
     },
 
     ratingsQuantity: {
@@ -39,7 +49,11 @@ const tourSchema = new mongoose.Schema(
     },
 
     priceDiscount: {
-      type: Number
+      type: Number,
+      // custom validator
+      validate: function(val) {
+        return val < this.price; 
+      }
     },
 
     summary: {
@@ -105,10 +119,6 @@ tourSchema.pre('save', function(next) {
 });
 
 // //post middleware
-// tourSchema.post('save', function(doc, next) {
-//   console.log(doc);
-//   next();
-// });
 
 // QUERY MIDDLEWARE
 
@@ -121,8 +131,14 @@ tourSchema.pre(/^find/, function(next) {
 });
 
 // AGGREGATION MIDDLEWARE
-
-tourSchema
+// this points to aggregation object
+tourSchema.pre('aggregate', function(next) {
+  //unshift add in front of array
+  this.pipeline().unshift({
+    $match: { secretTour: { $ne: true } }
+  });
+  next();
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
