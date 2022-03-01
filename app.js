@@ -22,15 +22,6 @@ app.use('/api/v1/users', userRouter);
 // NOTE: as this will be hit last, that means the route isn't valid
 // rest all urls error handling
 app.all('*', (req, res, next) => {
-  // res.status(404).json({
-  //   status: 'failed',
-  //   message: `Can't find ${req.originalUrl}`
-  // });
-
-  // const err = new Error(`Can't find ${req.originalUrl}`);
-  // err.status = 'fail';
-  // err.statusCode = 404;
-
   next(new AppError(`Can't find ${req.originalUrl}`, 404));
   // NOTE: whenever we pass argument to next express detect as error,and pass on to the global error middleware defined
 });
