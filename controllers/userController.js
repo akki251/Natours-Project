@@ -39,7 +39,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   // body.role = admin security breach
 
   const filteredBody = filterObj(req.body, 'name', 'email');
-  
+
   const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
     new: true,
     runValidators: true
@@ -50,6 +50,15 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     data: {
       user: updatedUser
     }
+  });
+});
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user._id, { active: false });
+
+  res.status(204).json({
+    status: 'success',
+    data: null
   });
 });
 

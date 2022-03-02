@@ -60,7 +60,21 @@ const userSchema = new mongoose.Schema({
     type: String
   },
 
-  passwordResetExpires: Date
+  passwordResetExpires: Date,
+
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  }
+});
+
+// query middleware ot filter  non active users 
+userSchema.pre(/^find/, function(next) {
+  // this points to current query
+  this.find({ active: { $ne: false } });
+
+  next();
 });
 
 // pre save middleware
