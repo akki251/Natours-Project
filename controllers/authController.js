@@ -16,6 +16,27 @@ const signToken = id => {
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user.id);
 
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true // prevent modifying of cookie
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    cookie.options.secure = true;
+  }
+
+  // storing the jwt in cookie
+  res.cookie('jwt', token, cookieOptions);
+
+
+
+  // hiding password from response 
+  // NOTE:we aren't making password undefined in the database, as we are not using save, 
+  user.password = undefined
+
+
   res.status(statusCode).json({
     status: 'success',
     token,
