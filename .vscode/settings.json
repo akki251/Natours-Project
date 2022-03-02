@@ -6,6 +6,7 @@
         "changepassword",
         "fucn",
         "hardcopy",
-        "middlewares"
+        "middlewares",
+        "updatemypassword"
     ]
 }

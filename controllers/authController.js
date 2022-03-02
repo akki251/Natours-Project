@@ -13,6 +13,18 @@ const signToken = id => {
   });
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user.id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user
+    }
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   // LOOPHOLE : SECURITY BREACH : anyone can role as admin in the body and can register
   // const newUser = await User.create(req.body);
@@ -27,16 +39,17 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role
   });
 
-  const token = signToken(newUser._id);
   // // payload ,secret
   // const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
   //   expiresIn: process.env.JWT_EXPIRES_IN
   // });
 
-  res.status(201).json({
-    token,
-    user: newUser
-  });
+  // res.status(201).json({
+  //   token,
+  //   user: newUser
+  // });
+
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -60,12 +73,11 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 3 . if everything is correct send the jwt token
 
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token
-  });
+  createSendToken(user, 200, res);
+  // res.status(200).json({
+  //   status: 'success',
+  //   token
+  // });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -90,6 +102,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   // NOTE using promisify to convert jwt.verify into promise, to maintain code consistency
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
+  console.log(decoded);
   // 3 check if user still exists
   const currentUser = await User.findById(decoded.id);
 
@@ -215,11 +228,25 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 3 Log in the user  and send jwt
+  createSendToken(User, 200, res);
+});
 
-  const token = signToken(user._id);
+// updating logged in user password
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  //  1  get the user from collection
+  const user = await User.findById(req.user._id).select('+password');
 
-  res.status(200).json({
-    status: 'success',
-    token
-  });
+  // 2. check posted password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong', 401));
+  }
+
+  //  if  so update the password
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save();
+  // NOTE: user.findOneAndUpdate will not make validators run hence we don't use it
+
+  //  log the user in again  with new token
+  createSendToken(user, 200, res);
 });
