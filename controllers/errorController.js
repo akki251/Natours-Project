@@ -1,11 +1,17 @@
 const AppError = require('../utils/appError');
 
+const handleJWT = () => {
+  return new AppError('Invalid Token, Please login Again', 401);
+};
+const handleJWTexpired = () => {
+  return new AppError('Your token has been expired, Please login Again', 401);
+};
+
 /// converting weird looking errors into some sensible, errors using out app error class
 const handleCastErrorDB = err => {
   const message = `Invalid ${err.path} : ${err.value}`;
   return new AppError(message, 400);
 };
-
 
 const handleDuplicateErrorDB = err => {
   const value = err.keyValue.name;
@@ -18,7 +24,6 @@ const handleValidationErrorDB = err => {
   const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
-
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
@@ -46,8 +51,6 @@ const sendErrorProd = (err, res) => {
   }
 };
 
-
-
 // GLOBAL ERROR MIDDLEWARE
 //NOTE: giving 4 arguments to middleware will automatically detected as error middleware
 module.exports = (err, req, res, next) => {
@@ -72,6 +75,16 @@ module.exports = (err, req, res, next) => {
     // validation error
     if (error._message === 'Validation failed') {
       error = handleValidationErrorDB(error);
+    }
+
+    // jwt validation error handling
+    if (error.name === 'JsonWebTokenError') {
+      error = handleJWT();
+    }
+
+    // jwt token expire error handling
+    if (error.name === 'TokenExpiredError') {
+      error = handleJWTexpired();
     }
 
     sendErrorProd(error, res);
