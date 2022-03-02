@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+
+const crypto = require('crypto');
+
 const bcrypt = require('bcrypt');
 const userSchema = new mongoose.Schema({
   name: {
@@ -51,7 +54,13 @@ const userSchema = new mongoose.Schema({
 
   passwordChangedAt: {
     type: Date
-  }
+  },
+
+  passwordResetToken: {
+    type: String
+  },
+
+  passwordResetExpires: Date
 });
 
 // pre save middleware
@@ -64,6 +73,19 @@ userSchema.pre('save', async function(next) {
 
   //deleting the confirm password as we no longer  need this field
   this.confirmPassword = undefined;
+
+  next();
+});
+
+userSchema.pre('save', function(next) {
+  // this.isNew means new document created
+  if (!this.isModified('password') || this.isNew) {
+    return next();
+  }
+
+  // to adjust the saving time difference
+
+  this.passwordChangedAt = Date.now() - 1000;
 
   next();
 });
@@ -89,6 +111,23 @@ userSchema.methods.changePasswordAfter = function(JWTTimestamp) {
 
   // NOTE: false means not changed after token issued, that means everything is fine
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function() {
+  // generating reset token
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  // encrypting and storing encrypted version in db
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // encrypted reset token expires after 10mins
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  // we will send this plain version by email to user
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);
