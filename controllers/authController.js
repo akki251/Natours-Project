@@ -5,6 +5,7 @@ const sendEmail = require('../utils/email');
 const { promisify } = require('util');
 const crypto = require('crypto');
 
+
 const jwt = require('jsonwebtoken');
 
 const signToken = id => {
@@ -15,6 +16,7 @@ const signToken = id => {
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user.id);
+
 
   const cookieOptions = {
     expires: new Date(
