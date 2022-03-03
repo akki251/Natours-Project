@@ -10,6 +10,7 @@ const xssClean = require('xss-clean');
 const hpp = require('hpp');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 // 1) GLOBAL MIDDLEWARES
 
@@ -52,7 +53,7 @@ app.use(
       'maxGroupSize',
       'difficulty',
       'price'
-     ]
+    ]
   })
 );
 
@@ -62,6 +63,7 @@ app.use(express.static(`${__dirname}/public`));
 // 3) ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // NOTE: as this will be hit last, that means the route isn't valid
 // rest all urls error handling

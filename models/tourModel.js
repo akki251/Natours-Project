@@ -142,6 +142,15 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// NOTE: Important concept, this is virtual population, it
+// doesn't get stored on database, but shows up in output.
+// it is as simple as storing array of reviews in tour model
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', // foreign field means how tour is denoted in Review model i.e tour
+  localField: '_id' // local fiedl means how tour is denoted in Tour model, i.e _id
+});
+
 // NOTE:
 // virtual properties ,
 //  we cannot use arrow function because of this.
