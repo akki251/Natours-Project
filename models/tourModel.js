@@ -148,7 +148,7 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual('reviews', {
   ref: 'Review',
   foreignField: 'tour', // foreign field means how tour is denoted in Review model i.e tour
-  localField: '_id' // local fiedl means how tour is denoted in Tour model, i.e _id
+  localField: '_id' // local field means how tour is denoted in Tour model, i.e _id
 });
 
 // NOTE:
