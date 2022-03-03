@@ -5,9 +5,11 @@
         "atmost",
         "changepassword",
         "fucn",
+        "geospatial",
         "hardcopy",
         "middlewares",
         "NOSQL",
-        "updatemypassword"
+        "updatemypassword",
+        "virtuals"
     ]
 }

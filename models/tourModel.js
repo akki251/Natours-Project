@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const slugify = require('slugify'); // for creating slug.. that is the name of tour in url
 
+// const User = require('./userModel');
+
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -31,7 +33,7 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A tour must have difficulty'],
       enum: {
-        values: ['easy', 'medium', 'difficulty'],
+        values: ['easy', 'medium', 'difficult'],
         message: 'Difficulty is either easy ,  medium or difficult'
       }
     },
@@ -98,7 +100,41 @@ const tourSchema = new mongoose.Schema(
     secretTour: {
       type: Boolean,
       default: false
-    }
+    },
+
+    startLocation: {
+      // GeoJSON geospatial data
+
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String
+    },
+
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number
+      }
+    ],
+
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
   {
     toJSON: { virtuals: true },
@@ -125,8 +161,6 @@ tourSchema.pre('save', function(next) {
   next(); // just like express
 });
 
-// //post middleware
-
 // QUERY MIDDLEWARE
 
 // tourSchema.pre('find', function(next) {
@@ -134,6 +168,15 @@ tourSchema.pre(/^find/, function(next) {
   // this is query, not document
   this.find({ secretTour: { $ne: true } });
 
+  next();
+});
+
+tourSchema.pre(/^find/, function(next) {
+  // this is query, not document
+  this.populate({
+    path: 'guides', // populate guides fields
+    select: '-__v -passwordChangedAt' // hiding these  fields
+  });
   next();
 });
 
