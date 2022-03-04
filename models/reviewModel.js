@@ -71,16 +71,24 @@ reviewSchema.statics.calcAverageRatings = async function(tourId) {
     }
   ]);
 
-  // stats is outputed as array
-  // saving in corresponding tour
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsQuantity: stats[0].nRating,
-    ratingsAverage: stats[0].avgRating
-  });
 
-  console.log(stats);
+  // only if we have some stats, else reset to default
+  if (stats.length > 0) {
+    // stats is outputed as array
+    // saving in corresponding tour
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5
+    });
+  }
 };
 
+/// this is document middleware i.e save and all ..
 reviewSchema.post('save', function() {
   // this points to current on review
 
@@ -89,6 +97,18 @@ reviewSchema.post('save', function() {
 
   // post middleware doesn't have access to next
   // next();
+});
+
+//// this is query middleware i.e find one and update ,and findby id ...
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+  this.r = await this.findOne();
+
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function() {
+  //  await this.findOne(); doesnot work here, as query has already executed
+  await this.r.constructor.calcAverageRatings(this.r.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
