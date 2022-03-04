@@ -9,15 +9,21 @@ router.post('/login', authController.login);
 
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
-router.patch(
-  '/updateMyPassword',
-  authController.protect,
-  authController.updatePassword
-);
 
-router.patch('/updateMe', authController.protect, userController.updateMe);
+// NOTE  as router act as mini express applicate,
+// this will act as app middleware, so routes below it should passs this middleware
+router.use(authController.protect);
 
-router.delete('/deleteMe', authController.protect, userController.deleteMe);
+router.patch('/updateMyPassword', authController.updatePassword);
+
+router.get('/me', userController.getMe, userController.getUser);
+
+router.patch('/updateMe', userController.updateMe);
+
+router.delete('/deleteMe', userController.deleteMe);
+
+/// NOTE same trick for restricing for routes that needs to be accessed by admin
+router.use(authController.restrictTo('admin'));
 
 router
   .route('/')
@@ -28,6 +34,6 @@ router
   .route('/:id')
   .get(userController.getUser)
   .patch(userController.updateUser)
-  .delete(userController.deleteUser); 
+  .delete(userController.deleteUser);
 
 module.exports = router;

@@ -69,7 +69,7 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// query middleware ot filter  non active users   
+// query middleware ot filter  non active users
 userSchema.pre(/^find/, function(next) {
   // this points to current query
   this.find({ active: { $ne: false } });

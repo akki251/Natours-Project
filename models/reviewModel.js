@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -53,6 +54,41 @@ reviewSchema.pre(/^find/, function(next) {
   });
 
   next();
+});
+
+// NOTE: static method....
+reviewSchema.statics.calcAverageRatings = async function(tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId }
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' }
+      }
+    }
+  ]);
+
+  // stats is outputed as array
+  // saving in corresponding tour
+  await Tour.findByIdAndUpdate(tourId, {
+    ratingsQuantity: stats[0].nRating,
+    ratingsAverage: stats[0].avgRating
+  });
+
+  console.log(stats);
+};
+
+reviewSchema.post('save', function() {
+  // this points to current on review
+
+  /// as Review is not accessble here we use this.construtor
+  this.constructor.calcAverageRatings(this.tour); // ===> // Review.calcAverageRatings(this.tour);
+
+  // post middleware doesn't have access to next
+  // next();
 });
 
 const Review = mongoose.model('Review', reviewSchema);

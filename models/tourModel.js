@@ -142,6 +142,16 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+/// for faster searching in database, we set index of most commonly search queries.
+// tourSchema.index({ price: 1 }); ,  ---> this is individual index
+
+// 1->for sorting ascending adn -1 for sorting descending however it's not much important
+tourSchema.index({ price: 1, ratingsAverage: -1 }); /// ->> this is compund index, it works for individual index as well
+tourSchema.index({ slug: 1 });
+
+
+
+
 // NOTE: Important concept, this is virtual population, it
 // doesn't get stored on database, but shows up in output.
 // it is as simple as storing array of reviews in tour model

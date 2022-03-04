@@ -3,6 +3,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const factory = require('./handlerFactory');
 
+/// for filtering role
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach(el => {
@@ -14,17 +15,10 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users
-    }
-  });
-});
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+};
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1.  if user tried to update password
@@ -38,14 +32,12 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   }
 
   // body.role = admin security breach
-
   const filteredBody = filterObj(req.body, 'name', 'email');
 
   const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
     new: true,
     runValidators: true
   });
-
   res.status(200).json({
     status: 'success',
     data: {
@@ -56,29 +48,24 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user._id, { active: false });
-
   res.status(204).json({
     status: 'success',
     data: null
   });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!'
-  });
-};
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
-    message: 'This route is not yet defined!'
+    message: 'This route is not yet defined! Please use signup instead'
   });
 };
 
-
-
-// DONT change password with this 
+// DONT change password with this
 exports.updateUser = factory.updateOne(User);
 
 exports.deleteUser = factory.deleteOne(User);
+
+exports.getUser = factory.getOne(User);
+
+exports.getAllUsers = factory.getAll(User);
