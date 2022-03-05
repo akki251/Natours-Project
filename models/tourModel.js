@@ -150,6 +150,8 @@ const tourSchema = new mongoose.Schema(
 tourSchema.index({ price: 1, ratingsAverage: -1 }); /// ->> this is compund index, it works for individual index as well
 tourSchema.index({ slug: 1 });
 
+tourSchema.index({ startLocation: '2dsphere' });
+
 // NOTE: Important concept, this is virtual population, it
 // doesn't get stored on database, but shows up in output.
 // it is as simple as storing array of reviews in tour model
@@ -197,15 +199,15 @@ tourSchema.pre(/^find/, function(next) {
   next();
 });
 
-// AGGREGATION MIDDLEWARE
-// NOTE: this points to aggregation object
-tourSchema.pre('aggregate', function(next) {
-  //unshift add in front of array
-  this.pipeline().unshift({
-    $match: { secretTour: { $ne: true } }
-  });
-  next();
-});
+// // AGGREGATION MIDDLEWARE
+// // NOTE: this points to aggregation object
+// tourSchema.pre('aggregate', function(next) {
+//   //unshift add in front of array
+//   this.pipeline().unshift({
+//     $match: { secretTour: { $ne: true } }
+//   });
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
