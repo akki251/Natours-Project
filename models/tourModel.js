@@ -182,13 +182,13 @@ tourSchema.pre('save', function(next) {
 
 // QUERY MIDDLEWARE
 
-// tourSchema.pre('find', function(next) {
-tourSchema.pre(/^find/, function(next) {
-  // this is query, not document
-  this.find({ secretTour: { $ne: true } });
+// // tourSchema.pre('find', function(next) {
+// tourSchema.pre(/^find/, function(next) {
+//   // this is query, not document
+//   this.find({ secretTour: { $ne: true } });
 
-  next();
-});
+//   next();
+// });
 
 tourSchema.pre(/^find/, function(next) {
   // this is query, not document
@@ -196,6 +196,11 @@ tourSchema.pre(/^find/, function(next) {
     path: 'guides', // populate guides fields
     select: '-__v -passwordChangedAt' // hiding these  fields
   });
+
+  // this.populate({
+  //   path: 'reviews'
+  // });
+
   next();
 });
 
