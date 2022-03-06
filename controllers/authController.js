@@ -5,7 +5,6 @@ const sendEmail = require('../utils/email');
 const { promisify } = require('util');
 const crypto = require('crypto');
 
-
 const jwt = require('jsonwebtoken');
 
 const signToken = id => {
@@ -16,7 +15,6 @@ const signToken = id => {
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user.id);
-
 
   const cookieOptions = {
     expires: new Date(
@@ -32,12 +30,9 @@ const createSendToken = (user, statusCode, res) => {
   // storing the jwt in cookie
   res.cookie('jwt', token, cookieOptions);
 
-
-
-  // hiding password from response 
-  // NOTE:we aren't making password undefined in the database, as we are not using save, 
-  user.password = undefined
-
+  // hiding password from response
+  // NOTE:we aren't making password undefined in the database, as we are not using save,
+  user.password = undefined;
 
   res.status(statusCode).json({
     status: 'success',
@@ -112,6 +107,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -150,12 +147,42 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
-// @ route
-// .delete(
-//   authController.protect,
-//   authController.restrictTo("admin" , "lead-guide"),
-//   tourController.deleteTour
-// );
+// MIDDLWARE only FOR rendering pages no errors !
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+
+
+  if (req.cookies.jwt) {
+    // 1. verify the token
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+
+    // 2 check if user still exists
+    const currentUser = await User.findById(decoded.id);
+
+    if (!currentUser) {
+      return next();
+    }
+
+    // 4 check if user changed password after the jwt token was issued
+    if (currentUser.changePasswordAfter(decoded.iat)) {
+      return next();
+    }
+
+    // that means it is a logged in user
+    // addding it to template .. ie res.locals.user
+    res.locals.user = currentUser;
+    return  next();
+  } 
+  
+  
+  else {
+    return next();
+  }
+
+
+});
 
 // @middleware
 // RESTRICTIONS MIDDLEWARE

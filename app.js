@@ -13,6 +13,7 @@ const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -22,9 +23,10 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // 1) GLOBAL MIDDLEWARES
-app.use(cors({ credentials: true}));
-
+app.use(cors());
 app.options('*', cors());
+
+
 
 //serving static files
 app.use(express.static(path.join(__dirname, 'public'))); // app.use(express.static(`${__dirname}/public`));
@@ -51,6 +53,7 @@ app.use(
     limit: '10kb' // body size max can be 10kb
   })
 );
+app.use(cookieParser());
 
 // Data Sanitization again NOSQL query INJECTION
 app.use(mongoSanitize());
@@ -72,6 +75,10 @@ app.use(
   })
 );
 
+app.use((req, res, next) => {
+  console.log(req.cookies);
+  next();
+});
 // 3) ROUTES
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
