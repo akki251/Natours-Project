@@ -1,3 +1,17 @@
+const hideAlert = () => {
+  const el = document.querySelector('.alert');
+  if (el) {
+    el.parentElement.removeChild(el);
+  }
+};
+
+const showAlert = (type, message) => {
+  hideAlert();
+  const markup = `<div class="alert alert--${type}">${message}</div>`;
+  document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
+  window.setTimeout(hideAlert, 5000);
+};
+
 const login = async (email, password) => {
   try {
     const res = await axios({
@@ -10,7 +24,7 @@ const login = async (email, password) => {
     });
 
     if (res.data.status === 'success') {
-      alert('you are logged in ');
+      showAlert('success', 'you are logged in');
       setTimeout(() => {
         location.assign('/');
       }, 1500);
@@ -18,7 +32,7 @@ const login = async (email, password) => {
 
     console.log(res);
   } catch (error) {
-    alert(error.response.data.message);
+    showAlert('error', error.response.data.message);
   }
 };
 
