@@ -25,29 +25,55 @@ const handleValidationErrorDB = err => {
   return new AppError(message, 400);
 };
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    error: err,
-    stack: err.stack
-  });
-};
-
-const sendErrorProd = (err, res) => {
-  // Operational that we send errors
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
+const sendErrorDev = (err, req, res) => {
+  // API MEANS DEVELOPMENT
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(err.statusCode).json({
       status: err.status,
-      message: err.message
+      message: err.message,
+      error: err,
+      stack: err.stack
     });
   } else {
-    console.error('ERROR😒', err);
-    // these are programming errors, we dont want to this to leaked to users
-    res.status(500).json({
-      status: 'error',
-      message: 'something went very wrong'
+    // RENDERED ERROR PAGE
+    return res.status(err.statusCode).render('error', {
+      title: 'something went wrong !!',
+      msg: err.message
     });
+  }
+};
+
+const sendErrorProd = (err, req, res) => {
+  // for API
+  if (req.originalUrl.startsWith('/api')) {
+    // Operational that we send errors
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message
+      });
+    } else {
+      console.error('ERROR😒', err);
+      // these are programming errors, we dont want to this to leaked to users
+      return res.status(500).json({
+        status: 'error',
+        message: 'something went very wrong'
+      });
+    }
+  } else {
+    // RENDERED WEBSITE
+    if (err.isOperational) {
+      return res.status(err.statusCode).render('error', {
+        title: 'something went wrong !!',
+        msg: err.message
+      });
+    } else {
+      console.error('ERROR😒', err);
+      return res.status(err.statusCode).render('error', {
+        title: 'something went wrong !!',
+        msg: 'Please try again later'
+      });
+    }
   }
 };
 
@@ -58,9 +84,11 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err }; // creating hardcopy, as it is not a good practice to overwrite arguments
+
+    error.message = err.message;
 
     if (error.name === 'CastError') {
       // when id pass not is not valid that is object id
@@ -87,6 +115,8 @@ module.exports = (err, req, res, next) => {
       error = handleJWTexpired();
     }
 
-    sendErrorProd(error, res);
+    console.log(error);
+
+    sendErrorProd(error, req, res);
   }
 };

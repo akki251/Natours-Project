@@ -26,8 +26,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(cors());
 app.options('*', cors());
 
-
-
 //serving static files
 app.use(express.static(path.join(__dirname, 'public'))); // app.use(express.static(`${__dirname}/public`));
 
@@ -54,6 +52,7 @@ app.use(
   })
 );
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true ,  limit : '10kb'}));
 
 // Data Sanitization again NOSQL query INJECTION
 app.use(mongoSanitize());

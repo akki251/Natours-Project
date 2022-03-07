@@ -24,7 +24,7 @@ const createSendToken = (user, statusCode, res) => {
   };
 
   if (process.env.NODE_ENV === 'production') {
-    cookie.options.secure = true;
+    cookieOptions.secure = true;
   }
 
   // storing the jwt in cookie
@@ -143,46 +143,48 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // GRANT ACCESS TO PROTECTED ROUTE
+  res.locals.user = currentUser;
   req.user = currentUser;
   next();
 });
 
 // MIDDLWARE only FOR rendering pages no errors !
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
-
+exports.isLoggedIn = async (req, res, next) => {
+  let currentUser = null;
+  let decoded = null;
 
   if (req.cookies.jwt) {
     // 1. verify the token
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET
-    );
+    try {
+      decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
 
-    // 2 check if user still exists
-    const currentUser = await User.findById(decoded.id);
+      // 2 check if user still exists
 
-    if (!currentUser) {
+      currentUser = await User.findById(decoded.id);
+
+      if (!currentUser) {
+        return next();
+      }
+
+      // 4 check if user changed password after the jwt token was issued
+      if (currentUser.changePasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // that means it is a logged in user
+      // addding it to template .. ie res.locals.user
+      res.locals.user = currentUser;
+      return next();
+    } catch (error) {
       return next();
     }
-
-    // 4 check if user changed password after the jwt token was issued
-    if (currentUser.changePasswordAfter(decoded.iat)) {
-      return next();
-    }
-
-    // that means it is a logged in user
-    // addding it to template .. ie res.locals.user
-    res.locals.user = currentUser;
-    return  next();
-  } 
-  
-  
-  else {
-    return next();
+  } else {
+    next();
   }
-
-
-});
+};
 
 // @middleware
 // RESTRICTIONS MIDDLEWARE
@@ -300,3 +302,14 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   //  log the user in again  with new token
   createSendToken(user, 200, res);
 });
+
+exports.logout = (req, res, next) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+
+  res.status(200).json({
+    status: 'success'
+  });
+};

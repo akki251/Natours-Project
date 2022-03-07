@@ -1,16 +1,4 @@
-const hideAlert = () => {
-  const el = document.querySelector('.alert');
-  if (el) {
-    el.parentElement.removeChild(el);
-  }
-};
-
-const showAlert = (type, message) => {
-  hideAlert();
-  const markup = `<div class="alert alert--${type}">${message}</div>`;
-  document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-  window.setTimeout(hideAlert, 5000);
-};
+import { showAlert } from './alerts.js';
 
 const login = async (email, password) => {
   try {
@@ -36,10 +24,33 @@ const login = async (email, password) => {
   }
 };
 
-document.querySelector('.form').addEventListener('submit', e => {
+document.querySelector('.form--login')?.addEventListener('submit', e => {
   e.preventDefault();
-
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   login(email, password);
 });
+
+// LOG OUT
+export const logout = async () => {
+  try {
+    const res = await axios({
+      method: 'GET',
+      url: 'http://localhost:3000/api/v1/users/logout'
+    });
+
+    if (res.data.status === 'success') {
+      // /NOTE force reload from server not from browser cache
+      location.reload(true);
+    }
+  } catch (err) {
+    console.log(err);
+    showAlert('error', 'Error Logging out ! Try again');
+  }
+};
+
+const logoutBtn = document.querySelector('.nav__el--logout');
+if (logoutBtn) {
+  console.log(logoutBtn);
+  logoutBtn.addEventListener('click', logout);
+}
