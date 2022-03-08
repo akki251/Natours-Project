@@ -3,6 +3,38 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const factory = require('./handlerFactory');
 
+const multer = require('multer');
+
+/// defining multer storage
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/users');
+  },
+  filename: (req, file, cb) => {
+    // user-userid-currenTimestamp.jpeg
+
+    const extension = file.mimetype.split('/')[1];
+    cb(null, `user-${req.user.id}-${Date.now()}.${extension}`);
+  }
+});
+
+/// filtering the file upload
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('not an image, please upload only images', 400), false);
+  }
+};
+
+// save images from user upload
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadUserPhoto = upload.single('photo');
+
 /// for filtering role
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -33,6 +65,10 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   // body.role = admin security breach
   const filteredBody = filterObj(req.body, 'name', 'email');
+
+  if (req.file) {
+    filteredBody.photo = req.file.filename;
+  }
 
   const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
     new: true,
