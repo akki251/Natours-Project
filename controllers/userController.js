@@ -4,8 +4,7 @@ const AppError = require('../utils/AppError');
 const factory = require('./handlerFactory');
 
 const sharp = require('sharp'); // for image processing
-const multer = require('multer'); // for image uploading 
-
+const multer = require('multer'); // for image uploading
 
 const multerStorage = multer.memoryStorage();
 
@@ -27,14 +26,14 @@ const upload = multer({
 /// final upload
 exports.uploadUserPhoto = upload.single('photo');
 
-exports.resizeUserPhoto = (req, res, next) => {
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) {
     return next();
   }
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({
@@ -43,7 +42,7 @@ exports.resizeUserPhoto = (req, res, next) => {
     .toFile(`public/img/users/${req.file.filename}`);
 
   next();
-};
+});
 
 /// for filtering role
 const filterObj = (obj, ...allowedFields) => {
