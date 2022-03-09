@@ -1,10 +1,10 @@
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
-const sendEmail = require('../utils/email');
+// const sendEmail = require('../utils/email');
 const { promisify } = require('util');
 const crypto = require('crypto');
-
+const Email = require('../utils/email');
 const jwt = require('jsonwebtoken');
 
 const signToken = id => {
@@ -66,6 +66,17 @@ exports.signup = catchAsync(async (req, res, next) => {
   //   token,
   //   user: newUser
   // });
+
+  console.log(newUser);
+  // http://localhost:3000/me
+  let host;
+  if (req.get('host').startsWith(1)) {
+    host = "localhost:3000";
+  }
+  const url = `${req.protocol}://${host}/me`;
+
+  const emailObject = new Email(newUser, url);
+  await emailObject.sendWelcome();
 
   createSendToken(newUser, 201, res);
 });
