@@ -24,9 +24,13 @@ const updateSettings = async (data, type) => {
 
 document.querySelector('.form-user-data').addEventListener('submit', e => {
   e.preventDefault();
-  const name = document.querySelector('.form-user-data #name').value;
-  const email = document.querySelector('.form-user-data #email').value;
-  updateSettings({ name, email }, 'data');
+
+  const form = new FormData();
+
+  form.append('name', document.querySelector('.form-user-data #name').value);
+  form.append('email', document.querySelector('.form-user-data #email').value);
+  form.append('photo', document.getElementById('photo').files[0]);
+  updateSettings(form, 'data');
 });
 
 document
@@ -35,9 +39,7 @@ document
     e.preventDefault();
 
     // <div class="spinner-border text-success"></div>
-    document.querySelector(
-      '.btn--save-password'
-    ).textContent = "Updating ....";
+    document.querySelector('.btn--save-password').textContent = 'Updating ....';
 
     const passwordCurrent = document.getElementById('password-current').value;
     const password = document.getElementById('password').value;
