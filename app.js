@@ -11,6 +11,7 @@ const hpp = require('hpp');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -30,7 +31,58 @@ app.options('*', cors());
 app.use(express.static(path.join(__dirname, 'public'))); // app.use(express.static(`${__dirname}/public`));
 
 // a. security http headers
-app.use(helmet());
+app.use(
+    helmet({
+      crossOriginEmbedderPolicy: false,
+      crossOriginResourcePolicy: { policy: 'cross-origin'},
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'", 'data:', 'blob:', 'https:', 'ws:'],
+          baseUri: ["'self'"],
+          fontSrc: ["'self'", 'https:', 'data:'],
+          scriptSrc: [
+            "'self'",
+            'https:',
+            'http:',
+            'blob:',
+            'https://*.mapbox.com',
+            'https://js.stripe.com',
+            'https://m.stripe.network',
+            'https://*.cloudflare.com',
+            'https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.js'
+          ],
+          frameSrc: ["'self'", 'https://js.stripe.com'],
+          objectSrc: ["'none'"],
+          styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+          workerSrc: [
+            "'self'",
+            'data:',
+            'blob:',
+            'https://*.tiles.mapbox.com',
+            'https://api.mapbox.com',
+            'https://events.mapbox.com',
+            'https://m.stripe.network'
+          ],
+          childSrc: ["'self'", 'blob:'],
+          imgSrc: ["'self'", 'data:', 'blob:'],
+          formAction: ["'self'"],
+          connectSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            'data:',
+            'blob:',
+            'https://*.stripe.com',
+            'https://*.mapbox.com',
+            'https://*.cloudflare.com/',
+            'https://bundle.js:*',
+            'ws://localhost:*/'
+          ],
+          upgradeInsecureRequests: []
+        }
+      }
+    })
+  );
+
 
 // development logging
 if (process.env.NODE_ENV === 'development') {
@@ -52,7 +104,7 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true ,  limit : '10kb'}));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Data Sanitization again NOSQL query INJECTION
 app.use(mongoSanitize());
@@ -74,15 +126,15 @@ app.use(
   })
 );
 
-app.use((req, res, next) => {
-  // console.log(req.cookies);
-  next();
-});
+
+
+
 // 3) ROUTES
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 // NOTE: as this will be hit last, that means the route isn't valid
 // rest all urls error handling

@@ -22,7 +22,7 @@ const updateSettings = async (data, type) => {
   }
 };
 
-document.querySelector('.form-user-data').addEventListener('submit', e => {
+document.querySelector('.form-user-data')?.addEventListener('submit', e => {
   e.preventDefault();
 
   const form = new FormData();
@@ -35,7 +35,7 @@ document.querySelector('.form-user-data').addEventListener('submit', e => {
 
 document
   .querySelector('.form-user-password')
-  .addEventListener('submit', async e => {
+  ?.addEventListener('submit', async e => {
     e.preventDefault();
 
     // <div class="spinner-border text-success"></div>
