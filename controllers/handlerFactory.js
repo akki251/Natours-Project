@@ -60,7 +60,6 @@ exports.getOne = (Model, popOptions) =>
     let query = Model.findById(req.params.id);
 
     if (popOptions) query = query.populate(popOptions);
-
     doc = await query;
 
     if (!doc) {
