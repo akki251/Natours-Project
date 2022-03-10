@@ -14,7 +14,6 @@ bookBtn.addEventListener('click', e => {
   const tourId = e.target.dataset.tourId;
   e.target.textContent = 'Processing';
   bookTour(tourId);
-  e.target.textContent = 'Done';
 });
 
 const bookTour = async tourId => {
