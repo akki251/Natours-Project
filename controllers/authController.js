@@ -67,11 +67,11 @@ exports.signup = catchAsync(async (req, res, next) => {
   //   user: newUser
   // });
 
-  console.log(newUser);
+  // console.log(newUser);
   // http://localhost:3000/me
   let host;
   if (req.get('host').startsWith(1)) {
-    host = "localhost:3000";
+    host = 'localhost:3000';
   }
   const url = `${req.protocol}://${host}/me`;
 
@@ -236,17 +236,17 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3 send it to user's email
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/users/resetPassword/${resetToken}`;
+  let host;
+  if (req.get('host').startsWith(1)) {
+    host = 'localhost:3000';
+  }
 
-  const message = `Forgot your Password ? Submit a patch request with your new password and password Confirm to: ${resetURL}. \n if you didn't forget your password, please ignore this email`;
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token only valid for 10 mins',
-      message
-    });
+    const resetURL = `${
+      req.protocol
+    }://${host}/api/v1/users/resetPassword/${resetToken}`;
+
+    await new Email(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: 'success',
@@ -291,7 +291,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 3 Log in the user  and send jwt
-  createSendToken(User, 200, res);
+  createSendToken(user, 200, res);
 });
 
 // updating logged in user password

@@ -2,18 +2,23 @@ const nodemailer = require('nodemailer');
 const pug = require('pug');
 const htmlToText = require('html-to-text');
 
-
 class Email {
   constructor(user, url) {
     this.to = user.email;
     this.firstName = user.name;
     this.url = url;
-    this.from = 'akshansh773@gmail.com';
+    this.from = 'akshansh261@gmail.com';
   }
 
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
-      //  sendgrid
+     return  nodemailer.createTransport({
+        service: 'SendGrid',
+        auth: {
+          user: process.env.SENDGRID_USERNAME,
+          pass: process.env.SENDGRID_PASSWORD
+        }
+      });
 
       return 1;
     }
@@ -56,8 +61,11 @@ class Email {
     await this.send('Welcome', 'Welcome to the Natours App');
   }
 
-  getThis() {
-    return this;
+  async sendPasswordReset() {
+    await this.send(
+      'passwordReset',
+      'Your Password reset toke valid for only 10 mins'
+    );
   }
 }
 
