@@ -14,7 +14,7 @@ const cookieParser = require('cookie-parser');
 const userRouter = require('./routes/userRoutes');
 const compression = require('compression');
 const tourRouter = require('./routes/tourRoutes');
-const AppError = require('./utils/appError');
+const AppError = require('./utils/AppError');
 const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
@@ -125,7 +125,6 @@ app.use(
     ]
   })
 );
-
 
 app.use(compression());
 

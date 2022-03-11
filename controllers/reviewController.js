@@ -1,5 +1,5 @@
 // const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/apperror');
+const AppError = require('../utils/AppError');
 
 const Review = require('../models/reviewModel');
 const factory = require('./handlerFactory');

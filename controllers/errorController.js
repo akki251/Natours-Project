@@ -1,4 +1,4 @@
-const AppError = require('../utils/apperror');
+const AppError = require('../utils/AppError');
 
 const handleJWT = () => {
   return new AppError('Invalid Token, Please login Again', 401);
