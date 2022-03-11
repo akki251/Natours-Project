@@ -3,8 +3,13 @@
   "version": "1.0.0",
   "description": "Learning node, express and mongoDB",
   "main": "app.js",
+  "engines": {
+    "node": "12.14.1",
+    "npm": "6.13.4"
+  },
   "scripts": {
     "start:dev": "NODE_ENV=development nodemon server.js",
+    "start": "node server.js",
     "start:prod": "NODE_ENV=production nodemon server.js",
     "debug": "ndb server.js"
   },
