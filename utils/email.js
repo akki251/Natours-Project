@@ -57,7 +57,7 @@ class Email {
   }
 
   async sendWelcome() {
-    console.log(this, '👍');
+    // console.log(this, '👍');
     await this.send('Welcome', 'Welcome to the Natours App');
   }
 

@@ -115,7 +115,7 @@ module.exports = (err, req, res, next) => {
       error = handleJWTexpired();
     }
 
-    console.log(error);
+    // console.log(error);
 
     sendErrorProd(error, req, res);
   }

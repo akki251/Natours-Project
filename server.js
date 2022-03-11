@@ -1,8 +1,5 @@
 const dotenv = require('dotenv');
 
-
-
-
 //  uncaught exception
 process.on('uncaughtException', err => {
   console.log(err.name, err.message);
@@ -32,7 +29,6 @@ mongoose
     console.log('Db connection successful');
   });
 
-  
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);

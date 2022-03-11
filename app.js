@@ -15,6 +15,7 @@ const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const app = express();
 
@@ -32,57 +33,56 @@ app.use(express.static(path.join(__dirname, 'public'))); // app.use(express.stat
 
 // a. security http headers
 app.use(
-    helmet({
-      crossOriginEmbedderPolicy: false,
-      crossOriginResourcePolicy: { policy: 'cross-origin'},
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'", 'data:', 'blob:', 'https:', 'ws:'],
-          baseUri: ["'self'"],
-          fontSrc: ["'self'", 'https:', 'data:'],
-          scriptSrc: [
-            "'self'",
-            'https:',
-            'http:',
-            'blob:',
-            'https://*.mapbox.com',
-            'https://js.stripe.com',
-            'https://m.stripe.network',
-            'https://*.cloudflare.com',
-            'https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.js'
-          ],
-          frameSrc: ["'self'", 'https://js.stripe.com'],
-          objectSrc: ["'none'"],
-          styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
-          workerSrc: [
-            "'self'",
-            'data:',
-            'blob:',
-            'https://*.tiles.mapbox.com',
-            'https://api.mapbox.com',
-            'https://events.mapbox.com',
-            'https://m.stripe.network'
-          ],
-          childSrc: ["'self'", 'blob:'],
-          imgSrc: ["'self'", 'data:', 'blob:'],
-          formAction: ["'self'"],
-          connectSrc: [
-            "'self'",
-            "'unsafe-inline'",
-            'data:',
-            'blob:',
-            'https://*.stripe.com',
-            'https://*.mapbox.com',
-            'https://*.cloudflare.com/',
-            'https://bundle.js:*',
-            'ws://localhost:*/'
-          ],
-          upgradeInsecureRequests: []
-        }
+  helmet({
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'", 'data:', 'blob:', 'https:', 'ws:'],
+        baseUri: ["'self'"],
+        fontSrc: ["'self'", 'https:', 'data:'],
+        scriptSrc: [
+          "'self'",
+          'https:',
+          'http:',
+          'blob:',
+          'https://*.mapbox.com',
+          'https://js.stripe.com',
+          'https://m.stripe.network',
+          'https://*.cloudflare.com',
+          'https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.js'
+        ],
+        frameSrc: ["'self'", 'https://js.stripe.com'],
+        objectSrc: ["'none'"],
+        styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+        workerSrc: [
+          "'self'",
+          'data:',
+          'blob:',
+          'https://*.tiles.mapbox.com',
+          'https://api.mapbox.com',
+          'https://events.mapbox.com',
+          'https://m.stripe.network'
+        ],
+        childSrc: ["'self'", 'blob:'],
+        imgSrc: ["'self'", 'data:', 'blob:'],
+        formAction: ["'self'"],
+        connectSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          'data:',
+          'blob:',
+          'https://*.stripe.com',
+          'https://*.mapbox.com',
+          'https://*.cloudflare.com/',
+          'https://bundle.js:*',
+          'ws://localhost:*/'
+        ],
+        upgradeInsecureRequests: []
       }
-    })
-  );
-
+    }
+  })
+);
 
 // development logging
 if (process.env.NODE_ENV === 'development') {
@@ -126,8 +126,7 @@ app.use(
   })
 );
 
-
-
+app.use(compression());
 
 // 3) ROUTES
 app.use('/', viewRouter);

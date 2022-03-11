@@ -4,7 +4,7 @@ const login = async (email, password) => {
   try {
     const res = await axios({
       method: 'POST',
-      url: 'http://localhost:3000/api/v1/users/login',
+      url: '/api/v1/users/login',
       data: {
         email,
         password
@@ -18,7 +18,7 @@ const login = async (email, password) => {
       }, 1500);
     }
 
-    console.log(res);
+    // console.log(res);
   } catch (error) {
     showAlert('error', error.response.data.message);
   }
@@ -36,7 +36,7 @@ export const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
-      url: 'http://localhost:3000/api/v1/users/logout'
+      url: '/api/v1/users/logout'
     });
 
     if (res.data.status === 'success') {
@@ -44,13 +44,13 @@ export const logout = async () => {
       location.reload(true);
     }
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     showAlert('error', 'Error Logging out ! Try again');
   }
 };
 
 const logoutBtn = document.querySelector('.nav__el--logout');
 if (logoutBtn) {
-  console.log(logoutBtn);
+  // console.log(logoutBtn);
   logoutBtn.addEventListener('click', logout);
 }
