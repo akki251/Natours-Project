@@ -3,19 +3,19 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const apperror = require('./utils/apperror');
-const globalErrorHandler = require('./controllers/errorController');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean');
 const hpp = require('hpp');
-const tourRouter = require('./routes/tourRoutes');
-const userRouter = require('./routes/userRoutes');
+const cors = require('cors');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
-const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const userRouter = require('./routes/userRoutes');
 const compression = require('compression');
+const tourRouter = require('./routes/tourRoutes');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
@@ -126,6 +126,7 @@ app.use(
   })
 );
 
+
 app.use(compression());
 
 // 3) ROUTES
@@ -138,7 +139,7 @@ app.use('/api/v1/bookings', bookingRouter);
 // NOTE: as this will be hit last, that means the route isn't valid
 // rest all urls error handling
 app.all('*', (req, res, next) => {
-  next(new apperror(`Can't find ${req.originalUrl}`, 404));
+  next(new AppError(`Can't find ${req.originalUrl}`, 404));
   // NOTE: whenever we pass argument to next express detect as error,and pass on to the global error middleware defined
 });
 
