@@ -31,7 +31,7 @@ document.querySelector('.form--login')?.addEventListener('submit', e => {
   login(email, password);
 });
 
-// LOG OUT
+// LOG 
 export const logout = async () => {
   try {
     const res = await axios({
