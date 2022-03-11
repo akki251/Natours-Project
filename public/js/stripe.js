@@ -1,7 +1,7 @@
 import { showAlert } from './alerts.js';
 
 const stripe = Stripe(
-  'pk_test_51KblnYSHXreynmNIkJlF3eNc2NpoIvmDEPF9lb6DMEzADZZekWzsm8auwWyJG1Mt7fAkOghCyeeeBVTRlREGjKw00HDz3OWDm'
+  'pk_test_51KblnYSHXreynmNIkJlF3eNc2NpoIvmDEPF9lb6DMEzADZZekWzbsm8auwWyJG1Mt7fAkOghCyeeeBVTRlREGjKw00HDz3OWDm'
 );
 
 const bookBtn = document.getElementById('book-tour');
@@ -17,7 +17,7 @@ const bookTour = async tourId => {
   // 1// get the session
   try {
     const session = await axios(
-      `/api/v1/bookings/checkoutSession/${tourId}`
+      `http://localhost:3000/api/v1/bookings/checkoutSession/${tourId}`
     );
     await stripe.redirectToCheckout({
       sessionId: session.data.session.id
@@ -26,6 +26,6 @@ const bookTour = async tourId => {
     // 2 create the checkout form + charge the credit car
   } catch (err) {
     showAlert('error', err);
-    // console.log(err);
+    console.log(err);
   }
 };

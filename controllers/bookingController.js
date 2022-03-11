@@ -1,26 +1,25 @@
 const stripe = require('stripe')(
   'sk_test_51KblnYSHXreynmNIb9gaRhvrfRHok9WdFvgxCLvG7Nf63LiJ80z6s3jh7lZYE4KrDZrmrDWgcmY8f4mW2zQNY1YS002UbeuOJ1'
 );
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
 const Tour = require('../models/tourModel');
-const Factory = require('./handlerFactory');
 const Booking = require('../models/bookingModel');
+const catchAsync = require('../utils/catchAsync');
+const factory = require('./handlerFactory');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
-  //1 get the currently booked tour from params
-
+  // 1) Get the currently booked tour
   const tour = await Tour.findById(req.params.tourID);
+  console.log(tour);
 
-  // 2// create the checkout session
+  // 2) Create checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${req.protocol}://${req.get('host')}/my-tours/?tour=${
+    success_url: `${req.protocol}://${req.get('host')}/?tour=${
       req.params.tourID
     }&user=${req.user.id}&price=${tour.price}`,
-    cancel_url: `${req.protocol}://localhost:3000/tour/${tour.slug}`,
-    customer_email: `${req.user.email}`,
-    client_reference_id: req.params.tourID,
+    cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
+    customer_email: req.user.email,
+    client_reference_id: req.params.tourId,
     line_items: [
       {
         name: `${tour.name} Tour`,
@@ -33,7 +32,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     ]
   });
 
-  // 3 and send it to the client
+  // 3) Create session as response
   res.status(200).json({
     status: 'success',
     session
@@ -41,24 +40,17 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 });
 
 exports.createBookingCheckout = catchAsync(async (req, res, next) => {
-  //   this is only temporary. beacuse it's unsecure, everyone can book without paying
+  // This is only TEMPORARY, because it's UNSECURE: everyone can make bookings without paying
   const { tour, user, price } = req.query;
 
-  if (!tour && !user && !price) {
-    return next();
-  }
-
-  await Booking.create({
-    tour,
-    user,
-    price
-  });
+  if (!tour && !user && !price) return next();
+  await Booking.create({ tour, user, price });
 
   res.redirect(req.originalUrl.split('?')[0]);
 });
 
-exports.createBooking = Factory.createOne(Booking);
-exports.getBooking = Factory.getOne(Booking);
-exports.getAllBookings = Factory.getAll(Booking);
-exports.updateBooking = Factory.updateOne(Booking);
-exports.deleteBooking = Factory.deleteOne(Booking);
+exports.createBooking = factory.createOne(Booking);
+exports.getBooking = factory.getOne(Booking);
+exports.getAllBookings = factory.getAll(Booking);
+exports.updateBooking = factory.updateOne(Booking);
+exports.deleteBooking = factory.deleteOne(Booking);
