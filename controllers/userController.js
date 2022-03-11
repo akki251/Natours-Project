@@ -1,6 +1,6 @@
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
+const AppError = require('../utils/apperror');
 const factory = require('./handlerFactory');
 
 const sharp = require('sharp'); // for image processing

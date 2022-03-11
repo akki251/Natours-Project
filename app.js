@@ -3,7 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const AppError = require('./utils/appError');
+const apperror = require('./utils/apperror');
 const globalErrorHandler = require('./controllers/errorController');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean');
@@ -138,7 +138,7 @@ app.use('/api/v1/bookings', bookingRouter);
 // NOTE: as this will be hit last, that means the route isn't valid
 // rest all urls error handling
 app.all('*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl}`, 404));
+  next(new apperror(`Can't find ${req.originalUrl}`, 404));
   // NOTE: whenever we pass argument to next express detect as error,and pass on to the global error middleware defined
 });
 

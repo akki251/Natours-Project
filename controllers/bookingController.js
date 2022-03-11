@@ -2,7 +2,7 @@ const stripe = require('stripe')(
   'sk_test_51KblnYSHXreynmNIb9gaRhvrfRHok9WdFvgxCLvG7Nf63LiJ80z6s3jh7lZYE4KrDZrmrDWgcmY8f4mW2zQNY1YS002UbeuOJ1'
 );
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
+const AppError = require('../utils/apperror');
 const Tour = require('../models/tourModel');
 const Factory = require('./handlerFactory');
 const Booking = require('../models/bookingModel');

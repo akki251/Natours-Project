@@ -1,5 +1,5 @@
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
+const AppError = require('../utils/apperror');
 const APIFeatures = require('../utils/APIFeatures');
 
 /// STANDARD TEMPLATE FOR DELETEONE CONTROLLER
