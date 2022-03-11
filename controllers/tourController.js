@@ -6,7 +6,7 @@ const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 const multer = require('multer'); // for image uploading
-const sharp = require('Sharp');
+const sharp = require("sharp");
 
 const multerStorage = multer.memoryStorage();
 
