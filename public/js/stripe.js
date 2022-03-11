@@ -1,10 +1,7 @@
 import { showAlert } from './alerts.js';
 
-// import axios from "axios"
-
-// window.alert('hi');
 const stripe = Stripe(
-  'pk_test_51KblnYSHXreynmNIkJlF3eNc2NpoIvmDEPF9lb6DMEzADZZekWzbsm8auwWyJG1Mt7fAkOghCyeeeBVTRlREGjKw00HDz3OWDm'
+  'pk_test_51KblnYSHXreynmNIkJlF3eNc2NpoIvmDEPF9lb6DMEzADZZekWzsm8auwWyJG1Mt7fAkOghCyeeeBVTRlREGjKw00HDz3OWDm'
 );
 
 const bookBtn = document.getElementById('book-tour');
