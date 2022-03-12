@@ -66,6 +66,8 @@ const createBookingCheckout = async session => {
     const user = await User.findOne({ email: session.customer_email }).id;
     const price = session.amount_total / 100;
 
+    console.log(tour);
+
     await Booking.create({ tour, user, price });
   } catch (error) {
     console.log(error, 'error in creating booking through stripe');
@@ -83,9 +85,7 @@ exports.webhookCheckout = (req, res, next) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
 
-    if (event.type === 'checkout-session-completed') {
-      createBookingCheckout(event.data.object);
-    }
+    createBookingCheckout(event.data.object);
 
     res.status(200).json({
       received: true
