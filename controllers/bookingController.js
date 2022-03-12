@@ -78,16 +78,16 @@ exports.webhookCheckout = (req, res, next) => {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
+
+    if (event.type === 'checkout-session-completed') {
+      createBookingCheckout(event.data.object);
+    }
+
+    res.status(200).json({
+      received: true
+    });
   } catch (error) {
     res.status(400).send('WEbhook error');
     console.log("STRIPE_ERROR + '😔");
   }
-
-  if (event.type === 'checkout-session-completed') {
-    createBookingCheckout(event.data.object);
-  }
-
-  res.status(200).json({
-    received: true
-  });
 };
