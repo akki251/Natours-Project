@@ -63,7 +63,7 @@ const createBookingCheckout = async session => {
   try {
     const tour = session.client_reference_id;
 
-    const user = await User.findOne({ email: session.customer_email }).id;
+    const user = (await User.findOne({ email: session.customer_email })).id;
     const price = session.amount_total / 100;
 
     console.log(tour);
@@ -84,7 +84,7 @@ exports.webhookCheckout = (req, res, next) => {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-
+    // checkout.session.completed
     createBookingCheckout(event.data.object);
 
     res.status(200).json({
