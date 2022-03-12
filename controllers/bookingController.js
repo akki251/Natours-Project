@@ -60,12 +60,16 @@ exports.updateBooking = factory.updateOne(Booking);
 exports.deleteBooking = factory.deleteOne(Booking);
 
 const createBookingCheckout = async session => {
-  const tour = session.client_reference_id;
+  try {
+    const tour = session.client_reference_id;
 
-  const user = await User.findOne({ email: session.customer_email }).id;
-  const price = session.display_items[0].amount / 100;
+    const user = await User.findOne({ email: session.customer_email }).id;
+    const price = session.amount_total / 100;
 
-  await Booking.create({ tour, user, price });
+    await Booking.create({ tour, user, price });
+  } catch (error) {
+    console.log(error, 'error in creating booking through stripe');
+  }
 };
 
 exports.webhookCheckout = (req, res, next) => {
