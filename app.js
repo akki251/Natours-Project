@@ -9,6 +9,7 @@ const hpp = require('hpp');
 const cors = require('cors');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./routes/bookingController');
 const viewRouter = require('./routes/viewRoutes');
 const cookieParser = require('cookie-parser');
 const userRouter = require('./routes/userRoutes');
@@ -97,6 +98,13 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter);
+
+// we need stripe data as raw and not in json, that is the reason ,we are declaring its router as seprate.
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+);
 
 app.use(
   express.json({
