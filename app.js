@@ -14,6 +14,7 @@ const viewRouter = require('./routes/viewRoutes');
 const cookieParser = require('cookie-parser');
 const userRouter = require('./routes/userRoutes');
 const compression = require('compression');
+const bodyParser = require("body-parser");
 const tourRouter = require('./routes/tourRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -102,7 +103,7 @@ app.use('/api', limiter);
 // we need stripe data as raw and not in json, that is the reason ,we are declaring its router as seprate.
 app.post(
   '/webhook-checkout',
-  express.raw({ type: 'application/json' }),
+  bodyParser.raw({ type: 'application/json' }),
   bookingController.webhookCheckout
 );
 
