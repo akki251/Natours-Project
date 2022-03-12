@@ -1,5 +1,16 @@
 import { showAlert } from './alerts.js';
 
+
+
+// GLOBAL ALERT
+const alertMessage = document.querySelector("body").dataset.alert;
+
+if(alertMessage)
+{
+  showAlert("success",alertMessage)
+}
+
+
 const login = async (email, password) => {
   try {
     const res = await axios({
