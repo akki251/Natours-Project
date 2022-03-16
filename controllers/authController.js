@@ -51,7 +51,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
     // passwordChangedAt: req.body.passwordChangedAt,
-    role: req.body.role
+    // role: req.body.role
   });
 
   // // payload ,secret
@@ -72,8 +72,9 @@ exports.signup = catchAsync(async (req, res, next) => {
   }
   const url = `${req.protocol}://${host}/me`;
 
-  const emailObject = new Email(newUser, url);
-  await emailObject.sendWelcome();
+  // welcome email send 
+  // const emailObject = new Email(newUser, url);
+  // await emailObject.sendWelcome();
 
   createSendToken(newUser, 201, req, res);
 });

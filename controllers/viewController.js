@@ -70,3 +70,9 @@ exports.alerts = (req, res, next) => {
   }
   next();
 };
+
+exports.getSignUpForm = (req, res) => {
+  res.status(200).render('signup', {
+    title: 'Signup for new account'
+  });
+};

@@ -1,15 +1,11 @@
 import { showAlert } from './alerts.js';
 
-
-
 // GLOBAL ALERT
-const alertMessage = document.querySelector("body").dataset.alert;
+const alertMessage = document.querySelector('body').dataset.alert;
 
-if(alertMessage)
-{
-  showAlert("success",alertMessage)
+if (alertMessage) {
+  showAlert('success', alertMessage);
 }
-
 
 const login = async (email, password) => {
   try {
@@ -42,7 +38,7 @@ document.querySelector('.form--login')?.addEventListener('submit', e => {
   login(email, password);
 });
 
-// LOG 
+// LOG
 export const logout = async () => {
   try {
     const res = await axios({
