@@ -1,6 +1,6 @@
 
 ## Deployed Version
-Live demo (Feel free to visit) 👉 : https://natours-tour-project.herokuapp.com/
+Live demo (Feel free to visit) 👉 : https://natours-tour-project.cyclic.app/
 
 
 ## Key Features
